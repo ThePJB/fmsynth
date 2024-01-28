@@ -204,7 +204,9 @@ fn sample_next(o: &mut SampleRequestOptions) -> f32 {
     // 2 pi t
     let coeff = o.sample_count as f32 * 2.0 * PI / o.sample_rate;
 
-    let fmod = (o.sound.fmod_freq * coeff).sin() * o.sound.fmod_amt + 1.0;
+    let fmmod = (o.sound.fmmod_carrier_ratio * o.sound.fmod_carrier_ratio * o.sound.freq * coeff).sin() * o.sound.fmmod_amt + 1.0;
+    // let fmod = (o.sound.fmod_carrier_ratio * o.sound.freq * coeff).sin() * o.sound.fmod_amt + 1.0;
+    let fmod = ((o.sound.fmod_carrier_ratio * o.sound.freq + fmmod) * coeff).sin() * o.sound.fmod_amt + 1.0;
     let lfo = 1.0 - ((o.sound.amp_lfo_freq * coeff).sin() * o.sound.amp_lfo_amount);
 
     let attack_len = o.sound.A * o.sample_rate;
@@ -226,7 +228,7 @@ fn sample_next(o: &mut SampleRequestOptions) -> f32 {
     o.sound.amplitude *
     lfo *
     // (o.sound.freq * coeff).sin()
-    (o.sound.freq * fmod * coeff).sin()
+    ((o.sound.freq + fmod) * coeff).sin()
     // (o.sample_clock * o.sound.freq * 2.0 * std::f32::consts::PI / o.sample_rate).sin()
 }
 
